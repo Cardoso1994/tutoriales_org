@@ -1,0 +1,824 @@
+#+TITLE: Elisp
+#+STARTUP: CONTENT
+
+* Basic Syntax
+#+begin_src emacs-lisp
+(defun the-meaning-of-life (answer)
+  (message "The answer is %s" answer))
+
+;; Newlines and whitespaces can be added anywhere in lists
+(list 1 2 3
+      4 5 6
+      7 8 9)
+#+end_src
+
+* Values (or "Objects")
+Any value, or object, has a type. It also has a textual representation that may
+or may not be "readable".
+
+In other words, we can bound a variable to any kind of value, and the change it
+to a completely different one, and it is ok in elis. For example, we can assign
+a string to a variable and the assign an integer to the same variable.
+
+ONLY VALUES HAVE A TYPE.
+** Lisp types
++ Strings
++ Numbers (ints and floats)
++ Symbols
++ Cons cells
++ Arrays and vectors
++ etc
+** Emacs types
++ Buffers
++ Windows
++ Frames
++ Threads
++ Keymaps
++ etc
+* Forms
+A "form" is any lisp object that can be evaluated
+** How evaluation works
++ Lists
++ Symbols
++ all other object types
+#+begin_src emacs-lisp
+;; Primitives are usually self-evaluating
+42
+
+"Hello!"
+
+[1 2 (+ 1 2)]
+
+;; Not self-evaluating
+buffer-file-name
+
+;; Evaluates a function
+(+ 41 1)
+
+;; if we evaluate a list, lisp expects the first argument to be a function
+(300 100)
+
+;; nested expressions
+(+ 300 (- 200 100)
+   (* 5 5))
+#+end_src
+
+#+RESULTS:
+: Hello!
+* Symbols
+A symbol is also a type of object, but *it is not self-evaluating!*
+
+Symbols can contain alphanumeric characters plus many others
+#+begin_src emacs-lisp
+;; possible symbol characters
+- + = * / _ ~ @ $ % ^ & : < > { } ?
+#+end_src
+
+This gives us the ability to ascribe meanings to symbols based on the characters
+they contain. Some examples:
++ bui-keyword->symbol :: Convert from one type to another
++ efs/some-name :: Define a "namespace" for the symbol
++ *pcache-repositories* :: Indicates a global variable (not common in elisp)
++ string= ::  Check if something is equal to something else
+
+When a symbol is evaluated, it returns the variable value associated with that
+binding
+#+begin_src emacs-lisp
+buffer-file-name
+#+end_src
+
+Function names can't be evaluated like this though:
+#+begin_src emacs-lisp
+get-file-buffer
+#+end_src
+* Infix vs Prefix
+Lisp expressions use "prefix" notation:
+#+begin_src emacs-lisp
+;; whenever you have an expression for a function evaluation, the symbol for the
+;; function has to be the first item of the list
+(+ 100 58)
+
+(+ 300 (- 12 1))
+#+end_src
+
+Why is this useful? Because it puts all functions and operators at the same
+level of importance, even the ones you define!
+* Booleans
++ t :: analogous to True in other languages. (yes)
++ nil :: analogous to False or NULL in other languages (no)
+
+#+begin_src emacs-lisp
+;; both t and nil are symbols. Not exactly a data type
+(type-of t)
+(type-of nil)
+#+end_src
+* Equality
+There are different ways to compare equality in elisp
++ eq :: Are the two parameters the same object?
++ eql :: Are the two parameters the same object or the same number?
++ equal :: Are the two paramenters equivalent?
+
+#+begin_src emacs-lisp
+(setq test-val '(1 2 3))
+
+;; eq checks for the same object
+(eq 1 1)                        ;; t
+(eq 3.1 3.1)                    ;; nil
+(eq "Marco" "Marco")            ;; nil
+(eq '(1 2 3) '(1 2 3))          ;; nil
+(eq test-val test-val)          ;; t
+
+;; eql checks for the same object or number
+(eql 1 1)                       ;; t
+(eql 3.1 3.1)                   ;; t
+(eql "Marco" "Marco")           ;; nil
+(eql '(1 2 3) '(1 2 3))         ;; nil
+(eql test-val test-val)         ;; t
+
+;; equal checks for value comparison
+(equal 1 1)                     ;; t
+(equal 3.1 3.1)                 ;; t
+(equal "Marco" "Marco")         ;; t
+(equal '(1 2 3) '(1 2 3))       ;; t
+(equal test-val test-val)       ;; t
+#+end_src
+
+* Numbers
+There are two main types of numbers in Emacs Lisp:
++ Integers :: whole numbers
++ floating point numbers :: Numbers with a decimal
+
+#+begin_src emacs-lisp :tangle yes
+
+1               ;; integer
+3.14159         ;; float
+
+-1              ;; integer
+-3.14159        ;; float
+
+1.              ;; integer
+1.0             ;; float
+
+-0              ;; int (evaluates to zero)
+#+end_src
+** Operations
+We can perform mathematical operations on numbers:
+*The operator comes firts. Elisp uses Prefix expressions*
+
+#+begin_src emacs-lisp :tangle yes
+
+(+ 5 5)         ;; 10
+(- 5 5)         ;; 0
+(* 5 5)         ;; 25
+(/ 5 5)         ;; 1
+
+;; nested operations
+(+ (* 3 2)
+   (/ 25 5))    ;; 11
+
+;; modular arithmetic
+(% 11 5)        ;; 1 - integer modulo
+(mod 11.1 5)    ;; 1.1 - float modulo
+
+;; increments and decrements. Analgous to i++ and i-- in C
+(1+ 5)          ;; 6
+(1- 5)          ;; 4
+#+end_src
+
+We can also do conversions between floats and integers with the following
+functions:
++ truncate :: Rounds float to integer by moving towards zero
++ round ::  Rounds to the *nearest* integer
++ floor :: Rounds float to int *by substracting*
++ ceiling :: Rounds up to *next integer*
+
+#+begin_src emacs-lisp :tangle yes
+(truncate 1.2)  ;; 1
+(truncate -1.2) ;; -1
+
+(floor 1.2)     ;; 1
+(floor -1.2)    ;; -2
+
+(ceiling 1.2)   ;; 2
+(ceiling -1.2)  ;; -1
+
+(round 1.5)     ;; 2
+(round 1.4)     ;; 1
+(round -1.5)    ;; -2
+(round -1.4)    ;; -1
+#+end_src
+** Comparisons
+We can compare two numeric values (even ints against floats):
+
+#+begin_src emacs-lisp :tangle yes
+
+(= 1 1)         ;; t
+(= 1 1.)        ;; t
+(= 1 1.0)       ;; t
+(= 1 1 1.
+   1 1 1)       ;; t. Works with all representations of the same number
+
+(< 1 2)         ;; t
+(> 1 2)         ;; nil
+(> 1 1)         ;; nil
+(> 1.2 1)       ;; t
+
+(>= 1 1)        ;; t
+(<= -1 -1.0)    ;; t
+
+;; max and min work with chains of numbers
+(max 1 2)       ;; 2
+(min 1 2)       ;; 1
+#+end_src
+* Characters
+Chars are really just integers that are interpreted as characters:
+
+#+begin_src emacs-lisp :tangle yes
+?A              ;; 65
+?a              ;; 97
+
+?\n             ;; 10
+?\t             ;; 9
+
+;; unicode
+?\N{U+E0}       ;; 224
+?\u00e0         ;; 224
+?\U000000E0     ;; 224
+?\N{LATIN SMALL LETTER A WITH GRAVE} ;; 224
+
+;; Control and meta char syntax
+?\C-c           ;; 3
+(kbd "C-c")     ;; "^C". 3
+?\M-x           ;; 134217848
+(kbd "M-x")     ;; [134217848] (it is represented as an array)
+
+#+end_src
+
+** Comparisons
+#+begin_src emacs-lisp :tangle yes
+(char-equal ?A ?A)      ;; t
+(char-equal ?A 65)      ;; t
+
+;; in this case this expression returns true because of case-fold-search
+;; variable. If we can case-sensitive comparison, we must set case-fols-search
+;; to nil
+(char-equal ?A ?a)      ;; t
+case-fold-search
+
+(setq case-fold-search nil)
+(char-equal ?A ?a)      ;; nil
+
+;; setting case-fold-search back to t
+(setq case-fols-search t)
+#+end_src
+* Sequences
+In elisp there are many types of sequences:
++ strings
++ lists
++ arrays
+
+#+begin_src emacs-lisp :tangle yes
+;; check if something is a sequence
+(sequencep "Sequence?")         ;; t
+(sequencep "")                  ;; t
+
+(sequencep '(1 2 3))            ;; t
+(sequencep '())                 ;; t
+
+(sequencep [1 2 3 4])           ;; t
+(sequencep [])                  ;; t
+
+(sequencep 22)                  ;; nil
+(sequencep ?A)                  ;; nil
+
+;; nil can be treated as an empty list
+(sequencep nil)                 ;; t
+#+end_src
+
+We can get the length of any sequence with the =length= function:
+#+begin_src emacs-lisp :tangle yes
+(length "Hello!")       ;; 6
+(length "Marco")        ;; 5
+
+(length [1 2 3 4])      ;; 4
+
+(length '(1 2 3 4))     ;; 4
+(length '(1 2 (1 2) 4)) ;; 4
+
+(length '(1 2 3 4
+            (1 2 3 4)
+            [1 2 3 4])) ;; 6
+#+end_src
+
+We can get the element of any sequence type with the =elt= function:
+*zero-based indexing*
+#+begin_src emacs-lisp :tangle yes
+(elt "Hello!" 4)        ;; o
+(elt "Hello!" -1)       ;; error - out of range
+
+(elt '(3 2 1) 2)        ;; 1
+(elt '(3 2 1) )        ;; nil. out of range
+(elt '(3 2 1) -1)       ;; 3. Gives the first item no matter what
+(elt '(3 2 1) -5)       ;; 3. Gives the first item no matter what
+
+(elt [1 2 3 4] 2)       ;; 3
+(elt [1 2 3 4] 5)       ;; error - out of range. Arrays are fixed in size
+(elt [1 2 3 4] -1)      ;; error - out of range
+#+end_src
+* Strings
+Strings are arrays of characters:
+#+begin_src emacs-lisp :tangle yes
+"Hello!"
+
+;; we can split strings in multiple lines with "\"
+"Hello \
+Marco Antonio"
+
+;; we "escape" the backslash with another one if we actually want a backslash
+;; printed
+"Hello \\ Marco Antonio"
+
+;; makes a string of five "A" characters
+(make-string 5 ?A)
+
+;; make a string by giving the individual characters
+(string ?M ?a ?r ?c ?o)
+#+end_src
+** Predicates
+#+begin_src emacs-lisp :tangle yes
+(stringp "test")                ;; t
+(stringp 1)                     ;; nil
+
+(string-or-null-p "test")       ;; t
+(string-or-null-p nil)          ;; t
+
+(char-or-string-p ?A)           ;; t
+(char-or-string-p 65)           ;; t
+(char-or-string-p "A")          ;; t
+
+;; Strings can be seen as arrays or sequences. Since an array is a sequence.
+;; However, a string is not a list since it doesn't follow the same semantics.
+(arrayp "Array?")               ;; t
+(sequencep "Sequence?")         ;; t
+(listp "List?")                 ;; nil
+#+end_src
+** Comparisons
+We can compare string for equivalence or sorting with:
++ string= :: or =string-equal=
++ string< :: or =string-lessp=
++ string> :: or =string-greaterp=
+#+begin_src emacs-lisp :tangle yes
+(string= "Hello" "Hello")       ;; t
+(string= "Hello" "HELLO")       ;; nil
+
+;; both string< and string> compare the first one against the second one
+(string< "Hello" "Hello")       ;; nil
+(string< "Mello" "Yello")       ;; t. Lexicographically, "M" goes before "Y"
+(string< "Hell" "Hello")        ;; t. "Hell" is shorter than "Hello"
+
+(string> "Hello" "Hello")       ;; nil
+(string> "Mello" "Yello")       ;; nil
+(string> "Hell" "Hello")        ;; nil
+(string> "Yello" "Mello")       ;; t
+(string> "Hello" "Hell")        ;; t
+#+end_src
+** Operations
+#+begin_src emacs-lisp :tangle yes
+;; gives a substring starting at index 0 and ending at index 4 (exclusive)
+(substring "Hello" 0 4)                         ;; Hell
+
+;; gives a substring startingat index 1 and everything from it
+(substring "Hello" 1)                           ;; ello
+
+;; concatenate strings
+(concat "Hello" " " "Marco" " " "Antonio")      ;; "Hello Marco Antonio"
+(concat)                                        ;; empty string
+
+;; split strings based on a predefined pattern (regexp). By default " " space
+(split-string "Hello System Crafters!")
+
+;; both of these give the same result, because of case-fold-search
+(split-string "Hello System Crafters!" "s")     ;; ("Hello " "y" "tem Crafter" "!")
+(split-string "Hello System Crafters!" "S")     ;; ("Hello " "y" "tem Crafter" "!")
+(setq case-fold-search nil)
+(split-string "Hello System Crafters!" "s")     ;; ("Hello Sy" "tem Crafter" "!")
+(split-string "Hello System Crafters!" "S")     ;; ("Hello " "ystem Crafters!")
+(setq case-fold-search t)
+
+#+end_src
+** Formatting
+We can create a string from existing values using format
+#+begin_src emacs-lisp :tangle yes
+;; %d for integers, %s for sequences
+(format "Hello %d %s" 100 "Marco Cardoso")
+
+(format "Here's a list: %s" '(1 2 3))
+(format "Here's an array: %s" [1 2 3])
+
+(format "Here's Pi: %f" 3.14159)
+#+end_src
+** Messages
+We can write messages to the echo area (mini buffer) and *Messages* buffer using
+the =message= function:
+#+begin_src emacs-lisp :tangle yes
+(message "This is Pi: %f" 3.14159)
+#+end_src
+* Lists
+The list is possibly the most useful data type in Elisp.
+These are *linked lists*, that are created using something called *cons cells*
+** Cons Cells
+Cons Cells enable to chain together list elements using the *cons* container.
+
+We can think of a *cons* as a pair or /tuple/ with values that can be accessed
+with =car= and =cdr=
++ car :: Get the first value in the *cons*
++ cdr :: Get the second value in the *cons*
+#+begin_src emacs-lisp :tangle yes
+(cons 1 2)                      ;; (1 . 2)
+'(1 . 2)                        ;; (1 . 2)
+
+(car '(1 . 2))                  ;; 1
+(cdr '(1 . 2))                  ;; 2
+
+(setq some-cons '(1 . 2))
+some-cons
+(setcar some-cons 3)
+some-cons                       ;; (3 . 2)
+(setcdr some-cons 4)
+some-cons                       ;; (3 . 4)
+#+end_src
+** Building lists from Cons
+There are two ways to build a list from cons cells:
+A list can be seen as a cons pair where the first item is a value and the second
+item is anothe cons, which in turn contains a value an another cons, and so on,
+until we get to a =nil=
+#+begin_src emacs-lisp :tangle yes
+(cons 1 '(2 3 4))
+(cons 1 (cons 2 (cons 3 (cons 4 nil))))
+
+(cons '(1 2 3) '(4))                    ;; ((1 2 3) 4)
+
+(append '(1 2 3) 4)                     ;; (1 2 3 . 4)
+(append '(1 2 3) '(4))                  ;; (1 2 3 4)
+#+end_src
+** Predicates
+#+begin_src emacs-lisp :tangle yes
+(listp '(1 2 3))        ;; t
+(listp 1)               ;; nil
+
+(listp nil)             ;; t
+(cons 1 nil)            ;; (1) - list of only one element
+
+(listp (cons 1 2))      ;; t
+(listp (cons 1 (cons 2 (cons 3 (cons 4 nil))))) ;; t
+(consp (cons 1 (cons 2 (cons 3 (cons 4 nil))))) ;; t
+#+end_src
+** Alists
+Association lists (or /alists/) are lists containing cons pairs for the purpose
+of storing named values (key-value pairs):
+#+begin_src emacs-lisp :tangle yes
+(setq some-alist '((one . 1)
+                   (two . 2)
+                   (three . 3)))
+
+;; retrieve values based on keys
+(alist-get 'one some-alist)     ;; 1
+(alist-get 'two some-alist)     ;; 2
+(alist-get 'three some-alist)   ;; 3
+(alist-get 'four some-alist)    ;; nil
+
+;; get the tuple based on the key
+(assq 'one some-alist)          ;; (one . 1)
+
+;; get the tuple based on the value
+(rassq 1 some-alist)            ;; (one . 1)
+
+;; set values for an alist
+(setf (alist-get 'one some-alist) 5)
+(alist-get 'one some-alist)
+(setf (alist-get 'one some-alist) 1)
+(alist-get 'one some-alist)
+
+#+end_src
+** Plists
+A property list (or /plist/) is another way to do key-value pairs with a flat
+list:
+#+begin_src emacs-lisp :tangle yes
+(plist-get '(one 1 two 2) 'one)
+(plist-get '(one 1 two 2) 'two)
+
+(plist-put '(one 1 two 2) 'three 3)
+#+end_src
+* Arrays
+Arrays are sequences of values stores contiguously in memory. They are much
+*faster* to access than lists.
+
+#+begin_src emacs-lisp :tangle yes
+;; create an array
+(setq some-array [1 2 3 4])
+;; set first-arg index to second-arg value
+(aset some-array 1 5)
+some-array
+
+;; create a string
+(setq some-string "Hello!")
+;; set first-arg index to second-arg value
+(aset some-string 0 ?M)
+some-string
+#+end_src
+
+We can set all values in an array with =fillarray=
+#+begin_src emacs-lisp :tangle yes
+(setq some-array [1 2 3])
+(fillarray some-array 6)
+some-array
+#+end_src
+* Logical Expressions
+Logical expressions allow us to combine expressions using logical operators
+(and, or).
+** What is true?
+Practically everything is considered true except for =nil= and the *emtpy list*.
+#+begin_src emacs-lisp :tangle yes
+(if t           'true 'false)   ;; true
+(if 5           'true 'false)   ;; true
+(if ""          'true 'false)   ;; true
+(if "emacs"     'true 'false)   ;; true
+(if nil         'true 'false)   ;; false
+(if '()         'true 'false)   ;; false
+#+end_src
+
+#+RESULTS:
+: true
+** Logic operators
+A way to combina the truth or falsiness of expressions
++ not :: inverts the truth value of the argument
++ and :: returns the last value if all expressions are true
++ or :: returns the firts value that is truthy (short-circuits)
++ xor :: Returns the first value that is truthy (doesn't short circuit)
+
+#+begin_src emacs-lisp :tangle yes
+(not t)                 ;; nil
+(not 3)                 ;; nil
+(not nil)               ;; t
+
+(and t t t t 'foo)      ;; foo
+(and t t t 'foo t)      ;; t
+(and 1 2 3 4 5)         ;; 5
+(and nil 'something)    ;; nil
+
+(or nil 'something)     ;; something
+(or nil 'something t)   ;; something
+(or (- 3 3) (+ 2 0))    ;; 0
+#+end_src
+** If statement
+=if= evaluates an expression and based on the result, picks one of two branchecs
+to evaluate next.
+
+The true branch is a single expression, the false branch can be multiple
+expressions.
+#+begin_src emacs-lisp :tangle yes
+(if t 5
+  ;; you can add an arbitrary number of forms in the false branch
+  (message "Doing the extra stuff here")
+  (+ 2 2))
+#+end_src
+
+#+RESULTS:
+: 5
+
+We can use the =progn= expression to execute multiple commands in the =true=
+branch
+#+begin_src emacs-lisp :tangle yes
+(if nil
+    ;; true branch
+    (progn
+      (message "Hey, it is true!")
+      5)
+  ;; false branch
+  (message "Doing some extra stuff here!")
+  (+ 2 (* 3 5)))
+#+end_src
+** When and unless expressions
+These expressions are very useful for cases where we only care about one
+particular branch, this is, we only care whether a condition evaluates to =true=
+or =false=
++ =when= :: evaluates the following forms when the expression evaluates to =t=
++ =unless= :: evaluates the followinf forms when the expression evaluates to
+  =nil=
+*Both expressions accept more than one form to execute*
+#+begin_src emacs-lisp :tangle yes
+(when (> 2 1) 'foo)     ;; foo
+(unless (> 2 1) 'foo)   ;; nil
+
+(when (> 1 2) 'foo)     ;; nil
+(unless (> 1 2) 'foo)   ;; foo
+
+(when (> 2 1)
+  (message "tu mama es mi perra")
+  (* 3 (+ 5 15)
+     5)                                 ;; 5
+#+end_src
+** The =cond= expression
+The =cond= expression enables you to consicely list multiple conditions to check
+with resulting forms to execute:
+#+begin_src emacs-lisp :tangle yes
+;; define variable for multiple cases
+(setq a 1)
+(setq a 2)
+(setq a -1)
+
+(cond ((eql a 1) "Equal to 1")
+      ((> a 1) "Greater than 1")
+      (t "Something else"))
+#+end_src
+
+the =t= case is kind of an =else= case. It catches everything else that didn't fall into
+any of the other cases.
+* Loops
+*** while
+This loops until the condition returns false:
+#+begin_src emacs-lisp :tangle yes
+(setq my-loop-counter 0)
+
+(while (< my-loop-counter 5)
+       (message "I'm looping. %d" my-loop-counter)
+       (setq my-loop-counter (1+ my-loop-counter)))
+#+end_src
+
+*** dotimes
+#+begin_src emacs-lisp :tangle yes
+(dotimes (count 5)
+  (message "I'm looping more easily. %d" count))
+#+end_src
+
+*** dolist
+Loops for each item in a list:
+#+begin_src emacs-lisp :tangle yes
+(dolist (item '("one" "two" "three" "four" "five"))
+  (message "Item %s" item))
+#+end_src
+
+*** Recursion
+A function calls itself until it reaches a /base case/
+*elisp have problems with tail recursion*
+#+begin_src emacs-lisp :tangle yes
+(defun macm/recursion-test (counter limit)
+  (when (< counter limit)
+    (message "I'm looping via recursion! %d" counter)
+  (macm/recursion-test (1+ counter) limit)))
+
+(macm/recursion-test 0 5)
+#+end_src
+* Functions
+** What is a function?
++ A reusable piece of code
++ Can accept inputs via parameters
++ Usually *returns* a result
++ Often has a name, but it can also be anonymous
++ Can be called by any other code or function
+
+#+begin_src emacs-lisp :tangle yes
+(defun do-some-math (x y)
+  (* (+ x 20)
+     (- y 10)))
+
+(do-some-math 100 50)
+#+end_src
+** Function arguments
+Functions can have different types of arguments:
++ Optional :: Arguments that are not required to be provided. If an argument is
+  not passed into the function, it is assigned to =nil= by default, so one needs
+  to check if this optional parameters aren't =nil= inside the body of the
+  function.
++ Rest :: One variable to contain an arbitrary amount of remaining parameters.
+  Elisp gathers all of these rest arguments and makes a list of them, so we can
+  iterate over the elements of the list inside the function
+
+They can both be used in the same function definition.
+
+#+begin_src emacs-lisp :tangle yes
+(defun multiply-maybe (x &optional y z)
+  (* x
+     (or y 1)
+     (or z 1)))
+
+(multiply-maybe 5)              ;; 5
+(multiply-maybe 5 2)            ;; 10
+(multiply-maybe 5 2 10)         ;; 100
+(multiply-maybe 5 nil 10)       ;; 50
+(multiply-maybe 5 2 10 7)       ;; error. Wrong number of arguments
+
+(defun multiply-many (x &rest operands)
+  (dolist (operand operands)
+    (when operand
+      (setq x (* x operand))))
+  x)
+
+(multiply-many 5)              ;; 5
+(multiply-many 5 2)            ;; 10
+(multiply-many 5 2 10)         ;; 100
+(multiply-many 5 nil 10)       ;; 50
+(multiply-many 5 2 10 7)       ;; 700
+
+(defun multiply-two-or-many (x &optional y &rest operands)
+  (setq x (* x (or y 1)))
+  (dolist (operand operands)
+    (when operand
+      (setq x (* x operand))))
+  x)
+
+(multiply-two-or-many 5)                        ;; 5
+(multiply-two-or-many 5 2)                      ;; 10
+(multiply-two-or-many 5 2 10)                   ;; 100
+(multiply-two-or-many 5 nil 10)                 ;; 50
+(multiply-two-or-many 5 2 10 7)                 ;; 700
+(multiply-two-or-many 5 2 10 7 1 3 6)           ;; 12600
+#+end_src
+** Documenting a function
+The first form in the function body can be a string which describes the
+function. One can see this description inside /emacs/ via =M-x= and then
+=describe function=.
+
+#+begin_src emacs-lisp :tangle yes
+(defun do-some-math (x y)
+  "Multiplies the result of math expressions on the argument X an Y."
+  (* (+ x 20)
+     (- y 10)))
+#+end_src
+
+By convention, we /capitalize/ the names of all parameters to the function.
+
+For long, multiple lines, documentation strings: places the cursor on the
+docstring and press =M-q= to have emacs automatically split the docstring
+in multiple lines.
+#+begin_src emacs-lisp :tangle yes
+(defun do-some-math (x y)
+  "Multiplies the result of math expressions on the arguments X
+and Y. This documentation string is long so it wraps onto the
+next line. Keep in mind that you should not indent the following
+lines or the documentation string will look bad!"
+  (* (+ x 20)
+     (- y 10)))
+#+end_src
+** Functions without names
+Sometimes you need to pass a function to another function (or to a hook) but you
+don't want to define a name function for it.
+
+That is where /lambda functions/ come into play
+#+begin_src emacs-lisp :tangle yes
+(lambda (x y)
+  (+ 100 x y))
+
+;; you can call a lambda function directly
+;; Remember that in elisp we expect the first argument in a list to be a
+;; function. In this case we define the lambda function inline as the first
+;; element of the list, and 10 and 20 are the parameters of that anonymous
+;; function
+((lambda (x y)
+   (+ 100 x y))
+ 10 20)
+#+end_src
+** Invoking functions
+You can store a lambda function or named function reference in a variable:
+#+begin_src emacs-lisp :tangle yes
+;; the usual way
+(+ 2 2)
+
+;; calling it by symbol
+;; the single quote in '+ is a way to tell the ielm to treat literally the word
+;; to which the single quote is attached, i. e. don't try to evaluate it
+(funcall '+ 2 2)
+
+;; define a function that accepts a function
+(defun gimmie-function (fun x)
+  (message "Function %s -- Result: %d"
+           fun
+           (funcall fun x)))
+
+;; store a lambda in a variable
+(setq function-in-variable (lambda (arg) (+ arg 1)))
+
+;; define an equivalent function
+(defun named-version (arg)
+  (+ arg 1))
+
+;; invoke lambda from parameter
+(gimmie-function (lambda (arg) (+ arg 1)) 5)
+
+;; invoke lambda stored in variable
+(gimmie-function function-in-variable 5)
+
+;; invoke function by passing symbol
+(gimmie-function 'named-version 5)
+#+end_src
+
+Maybe you have a list of values that you want to pass to a function? Use =apply=
+instead!
+#+begin_src emacs-lisp :tangle yes
+(apply '+ '(2 2))
+(funcall '+ 2 2)
+
+;; even works with &optional and &rest parameters
+(apply 'multiply-many '(1 2 3 4 5))
+(apply 'multiply-two-or-many '(1 2 3 4 5))
+#+end_src

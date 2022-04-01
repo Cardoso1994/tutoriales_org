@@ -1,0 +1,53 @@
+#+TITLE: Dired Doom
+#+STARTUP: content
+
++ SPC o - :: open dired buffer in current file's buffer
+* Open files
++ RET :: opens file in the same buffer
++ SHIFT-RET :: opens file in a new split, without closing dired buffer
++ M-RET :: opens file in new split, WHITHOUT FOCUSING IT
++ g-o :: opens buffer in view mode. READ ONLY
+
+* Dired general stuff
++ spc-o-"-" :: open dired in the folder of current file and select current file
+* File Management
++ m :: marks a file
++ u :: unmarks file
++ U :: unmarks everything
++ t :: toggles marks. Unselects marked files and marks other files
++ %-m :: marks files based on regexp
++ *-. :: marks files based on given extension
++ k :: kills files. NOT DELETION, JUST "HIDES THEM"
+
+** Create file
++ SPC-. :: find file. We can create a file from here
+** Copy and rename
++ C-x C-q :: enters into vim normal mode. Easier for changing file names with
+  vim commands. For example =search and replace=
+This can be done on individual files, as well as groups of files that are marked
++ C :: copy to another folder or a different name
+        on groups we just copy to other directory
++ R :: rename. This is the same as the command =mv=
+        rename on a group of files moves them to other location
+** Delete
+In doom:
++ d :: flag (mark) file for deletion
++ x :: delete files
+
+
++ D :: delete files
++ d and after selection x :: start in a file, select all files to delete, and
+  press x
+
+** Compression
++ Z :: compress or uncompress to =tar.gz=
++ c :: compress file(s) to name (can give the extension as well, for example:
+  zip)
+
+** Touching files
++ S-t :: change timestamp
+
+** change mode
++ M :: chmod
++ O :: change owner
++ g-G :: change group

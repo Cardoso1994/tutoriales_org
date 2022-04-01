@@ -1,0 +1,61 @@
+#+TITLE: Conda
+
+Conda is a package manager initially developed for managing =python= environments
+
+* version
+to check what conda version is installed
+#+begin_src shell
+conda --version
+#+end_src
+* update
+*NOT RECOMMENDEN IN LINUX DISTRIBUTIONS* when installed from the package manager
+#+begin_src shell
+conda update conda
+#+end_src
+* Managing environments
+Conda creates environments so we can separate files, packages, dependencies
+so they do not interact between environments
+** Create a new environment and install a package in it
+#+begin_src shell
+conda create --name environment_name package_to install
+
+# example
+conda create --name cip numpy
+
+# env with specific python version
+conda create -n myenv python=3.8 numpy
+
+# env with specific package version
+conda create -n myenv scipy=0.15.0
+#+end_src
+** Install packages after environment creation
+#+begin_src shell
+conda create -n myenv python
+conda install -n myenv scipy=0.15.0
+#+end_src
+** Create environment with specific version and multiple packages (most complete)
+#+begin_src shell
+conda create -n myenv python=3.6 scipy=0.15.0 astroid babel
+#+end_src
+** Activate an environment
+#+begin_src shell
+conda activate environment_name
+
+# example
+conda activate cip
+#+end_src
+** Deactivate an environment
+#+begin_src shell
+conda deactivate
+#+end_src
+** Remove an environment
+#+begin_src shell
+conda remove --name myenv --all
+#+end_src
+** List Conda environments
+#+begin_src shell
+conda info --envs
+#+end_src
+* notas
++ moved =/opt/miniconda3/lib/libstdc++.so.6= to =/opt/miniconda3/lib/libstdc++.so.6.bak=
++ copied =/lib/libstdc++.so.6= to =/opt/miniconda3/lib/libstdc++.so.6=

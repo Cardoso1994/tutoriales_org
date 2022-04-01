@@ -1,0 +1,198 @@
+#+TITLE: Pyenv
+#+author: Marco Antonio Cardoso Moreno
+
+#+startup: CONTENT
+
+* Pyenv
+It is a tool for managing multiple python versions.
+Between the advantages that we may encounter when working with pyenv, we have:
++ Install Pyhton in our user space. (separated from system's own version of
+  python, which should not be touched)
++ Install multiple versions of Python
++ Specify the exact version of Python we want
++ Switch between the installed versions
+
+* Install a new Python with pyenv
+** List all the available options
+=pyenv install --list= will list all the available versions of python that can
+be installed. We can pipe the output to =grep= so we can limit our search, as
+shown below:
+#+begin_src bash
+pyenv install --list | grep " 3\.[678]"
+#+end_src
+
+#+RESULTS:
+|   3.6.0 |
+| 3.6-dev |
+|   3.6.1 |
+|   3.6.2 |
+|   3.6.3 |
+|   3.6.4 |
+|   3.6.5 |
+|   3.6.6 |
+|   3.6.7 |
+|   3.6.8 |
+|   3.6.9 |
+|  3.6.10 |
+|  3.6.11 |
+|  3.6.12 |
+|  3.6.13 |
+|  3.6.14 |
+|   3.7.0 |
+| 3.7-dev |
+|   3.7.1 |
+|   3.7.2 |
+|   3.7.3 |
+|   3.7.4 |
+|   3.7.5 |
+|   3.7.6 |
+|   3.7.7 |
+|   3.7.8 |
+|   3.7.9 |
+|  3.7.10 |
+|  3.7.11 |
+|   3.8.0 |
+| 3.8-dev |
+|   3.8.1 |
+|   3.8.2 |
+|   3.8.3 |
+|   3.8.4 |
+|   3.8.5 |
+|   3.8.6 |
+|   3.8.7 |
+|   3.8.8 |
+|   3.8.9 |
+|  3.8.10 |
+|  3.8.11 |
+|  3.8.12 |
+
+We can also install other builds, like =jython=, for example.
+** Install a Python version
+This is done with the following command
+#+begin_src bash
+pyenv install -v 3.7.2
+#+end_src
+this will install =python 3.7.2= in our user space.
+** Location of installed versions
+#+begin_src bash
+ls ~/.pyenv/versions/
+#+end_src
+Since all versions are located in this folder, it is trivial to remove one
+version, since it can be done via
+#+begin_src bash
+rm -rf ~/.pyenv/versions/version_to_be_removed
+#+end_src
+* Using a new Python version
+** see all installed versions
+#+begin_src bash
+pyenv versions
+#+end_src
+
+#+RESULTS:
+| *                     | system | (set | by | /home/cardoso/.pyenv/version) |
+| 3.6.7                 |        |      |    |                               |
+| 3.6.7/envs/algorithms |        |      |    |                               |
+| 3.6.7/envs/pygame     |        |      |    |                               |
+| 3.8.5                 |        |      |    |                               |
+| 3.8.5/envs/cip        |        |      |    |                               |
+| algorithms            |        |      |    |                               |
+| cip                   |        |      |    |                               |
+| pygame                |        |      |    |                               |
+the output of this command is a list of all python versions currently installed.
+One of them will be marked with a =*=, which means that this version is /the
+active version/.
+** =global= command
+If we want to use a specific version globally, meaning that this python
+version will be the one executed in all locations of our user space, we use the
+=global= command.
+#+begin_src bash
+pyenv global version_to_make_global
+#+end_src
+
+To return to the *system* version of Python, we type the following command:
+#+begin_src bash
+pyenv global system
+#+end_src
+** other pyenv commands
+To show all available commands, we type:
+#+begin_src bash
+pyenv commands
+#+end_src
+
+Every command comes with its own =--help= flag.
+
+*** install
+Installs a version of python, as seen before. Its flags are:
++ =-l/--list= :: lists all available versions of python for installation
++ =-g/--debug= :: buils a debug version of python
++ =-v/--verbos= :: verbose mode
+#+begin_src bash
+pyenv install version_to_be_installed
+#+end_src
+
+*** versions
+Displays the currently installed python versions
+#+begin_src bash
+pyenv versions
+#+end_src
+
+To show the *active version*, we type
+#+begin_src bash
+pyenv version
+#+end_src
+*** which
+Returns the full path to a system executable.
+#+begin_src bash
+pyenv which pip
+#+end_src
+*** global
+Sets the global version of Python. This ensures a particular version by default.
+Some other commands can override this behaviour.
+#+begin_src bash
+pyenv global version_to_be_global
+#+end_src
+*** local
+=local= is used to set an application-specific Python version. This is done
+inside a particular folder.
+#+begin_src bash
+pyenv local version_to_be_local
+#+end_src
+This creates a =.python-version= file in the current directory. If =pyenv= is
+active in our environment, this file will automatically activate the specified
+version.
+*** shell
+=shell= is used to set a shell specific version
+#+begin_src bash
+pyenv shell version_to_be_shel_specific
+#+end_src
+*** hierarchy of python versions
+The first of these 3 possibilities that pyenv can find, is the one that will be
+activated
++ =pyenv shell=
++ =pyenv local=
++ =pyenv global=
++ =system python=
+* virtual environments
++ pyenv :: manges multiple versions of Python
++ virtualenv/venv :: manages virtual environments for a specific Python version
++ pyenv-virtualenv :: manages virtual environments for across varying versions
+  of python
+** creating a virtual environment
+#+begin_src bash
+pyenv virtualenv <python_version> <environment_name>
+#+end_src
++ =environment_name= is just a name just to help keep environments nicely
+  separated. It is good practice to use the same name as the project folder.
+** activate a version
+once a virtual environment is created, we need to activate the enviroment via
+#+begin_src bash
+pyenv local project_name
+#+end_src
+where =project_name= is the name we gave to the virtual environment when we
+created it. This will create a =.python_version= file in the current directory
+and it will be automtically activated.
+
+We can verifiy the active python version with
+#+begin_src bash
+pyenv which python
+#+end_src

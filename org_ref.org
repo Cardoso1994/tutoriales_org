@@ -1,0 +1,34 @@
+#+TITLE: Org_ref
+#+author: Marco Antonio Cardoso Moreno
+
+* Org-ref
+We, first, need to add a /bibliography/ link in the document. We need to specify
+the name as well as the extension of the file. This is done by:
++ =bibliography:filename.bib=
++ =bibliography:filename.bib,other_filename.bib= :: if we want multiple bib
+  files
+
+To insert a reference we use the =org-ref-insert-cite-link=. By default, the
+inserted link is =cite=.
+
+We can also add labels and references with:
++ =label:label_name=
++ =ref:label_name=
+this works for tables, figures, equations, sections, etc
+
+For example
+#+caption: hola mundo label:hola_mundo
+Ver referencia en ref:hola_mundo
++ org-ref-insert-ref-link :: inserts reference links and lets you search for the
+  reference in a menu
++ org-ref-helm-insert-label-link :: creates a label, it lets you visualize
+  existing labels so there are no repeats
+
+For bibliography syle we use:
+=bibliographystyle:babunsrt=
+=bibliography:filename.bib=
+
+** packages
++ bibtex
++ babelbib
++ cite

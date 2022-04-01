@@ -1,0 +1,71 @@
+#+TITLE: Magit Doom
+
+#+STARTUP: content
+
+* Status Page
+- Show status page :: *SPC-g-g*
+  + All information needed, status, branches.
+  + Head, Rebase, Push, Tag
+  + Untracked files
+  + Unstaged files
+  + Staged Changes
+  + Recent commits
+- Expand sections :: *TAB*
+- ? :: List of commands. Help
+* Create repository
++ magit-init :: *SPC-g-c-r*
+  Initializes a new repository asking for the parent directory
++ magit-remote :: *M* (inside status page)
+  Add, configures, changes remotes.
+* Clone
++ magit-clone :: SPC-g-C
+* Pull
++ magit-pull :: *F* (inside status page)
+
+* Stage / unstage process
++ See file diff :: *TAB* (on the file)
++ s :: stage a chunk or a complete file
++ u :: unstage a chunk or a complete file
+
++ Stage part of changes from unstaged files ::
+  + Select section with /visual mode/
+  + Press *s*
+
++ Remove part changes from unstaged files ::
+  + Select section with /visual mode/
+  + Press *x*
+
+* Commit flow
++ c-c :: Commit
+  - Exit commit editor :: *:x* (evil-mode)
+  - Preview commit :: *ENTER* on a commit
+  - Quit commit without doing anything :: *:q* (evil-mode)
++ Include some changes in previous commit
+  1. stage changes as normal *(s)*
+  2. c-F: instant fixup command
+        gives a list of recent commits
+  3. C-c: on the corresponding commit to which we want to add the changes
+  4. P- (-f) -p: force push. =-f= is a flag for force push
+
+* Stashing
++ z-z :: stashes index and work tree. Asks for a stash message
+
+* Push
++ P :: push
+  + p :: push to remote (own remote)
+  + u :: push to upstream (another repo, ideally, somebody else's remote)
+  + e :: elsewhere
++ See remote URL :: *M*
+
+* Branches, tags, etc
++ b :: Branches
+  + b :: switch to branch. =git checkout=
+  + c :: create branch but don't switch to it. =git branch=
+  + s :: New spinoff. =git checkout -b= with extra stuff
+        takes all commits newer than that on =origin= and move them to the new
+        branch
+
++ Mark commit as a *tag* ::
+  + Go to particular commit and press *t*
+* Other general stuff
++ g-z :: refresh buffer

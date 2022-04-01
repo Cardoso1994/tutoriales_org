@@ -1,0 +1,12 @@
+#+TITLE: Org_agenda_doom
+
+* General
++ S-ARROWS :: cycle through keywords for tasks (TODO, DONE, etc)
++ org-schedule :: add date for a task
++ org-deadline :: add deadline for a task
++ org-time-stamp :: adds a time stamp. For birthdays, for example
+  - repeated tasks :: basic syntax at the end of time stamp
+  - <2021-06-28 lun repeated-task>
+    + +1d :: everyday
+    + +2y :: every two weeks
+    + +1w :: every week

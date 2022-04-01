@@ -1,0 +1,5 @@
+#+TITLE: Projectile Doom
+
+* General
++ SPC-p-p :: switch projects
++ SPC-SPC :: find file inside project
