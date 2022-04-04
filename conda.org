@@ -37,6 +37,22 @@ conda install -n myenv scipy=0.15.0
 #+begin_src shell
 conda create -n myenv python=3.6 scipy=0.15.0 astroid babel
 #+end_src
+** Create environment with yml file
+#+begin_src sh
+# The first line of the yml file sets the new environment's name. For details see Creating an environment file manually.
+conda env create -f environment.yml
+
+
+# Activate the new environment
+conda activate myenv
+
+# Verify that the new environment was installed correctly:
+conda env list
+
+# You can also use
+conda info --envs.
+#+end_src
+
 ** Activate an environment
 #+begin_src shell
 conda activate environment_name
@@ -55,6 +71,17 @@ conda remove --name myenv --all
 ** List Conda environments
 #+begin_src shell
 conda info --envs
+#+end_src
+** Share an environment
+*If you already have an environment.yml file in your current directory, it will
+be overwritten during this task.*
+
+#+begin_src sh
+# Activate the environment to export:
+conda activate myenv
+
+# Export your active environment to a new file:
+conda env export > environment.yml
 #+end_src
 * notas
 + moved =/opt/miniconda3/lib/libstdc++.so.6= to =/opt/miniconda3/lib/libstdc++.so.6.bak=
