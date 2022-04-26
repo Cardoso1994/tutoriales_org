@@ -52,6 +52,17 @@ conda env list
 # You can also use
 conda info --envs.
 #+end_src
+** Update an environment with yml file *preferred*
+When
++ one dependency has a new version, and we want to migrate to it
++ add a new additional package
++ add new dependency and get rid of older package
+
+We need to update the =environment.yml= file accordingly, and the run the
+following command:
+#+begin_src sh
+conda env update --file environment.yml --prune
+#+end_src
 
 ** Activate an environment
 #+begin_src shell
