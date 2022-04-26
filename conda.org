@@ -83,6 +83,10 @@ conda activate myenv
 # Export your active environment to a new file:
 conda env export > environment.yml
 #+end_src
+** Update an environment
+#+begin_src sh
+conda env update --file environment.yml  --prune
+#+end_src
 * notas
 + moved =/opt/miniconda3/lib/libstdc++.so.6= to =/opt/miniconda3/lib/libstdc++.so.6.bak=
 + copied =/lib/libstdc++.so.6= to =/opt/miniconda3/lib/libstdc++.so.6=
