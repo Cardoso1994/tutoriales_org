@@ -1,0 +1,19 @@
+#+title: Org Roam
+
+* Create a new node
+=org-roam-node-find= opens the completion engine to open a previously created
+node; if we write the name of a nonexistent node, org roam will create it. In order to
+save the node we need to /finish/ it with =C-c C-c= or the keybinding shown in the
+headerline of the buffer.
+
+* Insert node link inside anothe node
+=org-roam-node-insert= will open the completion buffer so we can select a node,
+then a link is inserted on the current buffer to such node. This works in a
+similar manner as =org-roam-node-find=, if we write the name of a nonexistent
+node, roam will create it for us.
+* Backlinks buffer
+=org-roam-buffer-toggle= opens the backlinks buffer, wich allows to see other
+nodes that have a link to the current node, so we can start to see connections
+between subjects that we did not think before.
+
+This buffer automatically updates when switching to another node.
